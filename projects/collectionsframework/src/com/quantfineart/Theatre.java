@@ -1,13 +1,10 @@
 package com.quantfineart;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Theatre {
     private final String theatreName;
-    private Collection<Seat> seats = new LinkedList<>();
+    private List<Seat> seats = new ArrayList<>();
 
     public Theatre(String theatreName, int numRows, int seatsPerRow) {
         this.theatreName = theatreName;
@@ -26,20 +23,15 @@ public class Theatre {
     }
 
     public boolean reserveSeat(String seatNumber) {
-        Seat requestedSeat = null;
-        for (Seat seat: seats) {
-            if(seat.getSeatNumber().equals(seatNumber)){
-                requestedSeat = seat;
-                break;
-            }
+        Seat requestedSeat = new Seat(seatNumber);
+        int foundSeat = Collections.binarySearch(seats, requestedSeat, null);
+        if(foundSeat >=0){
+            return seats.get(foundSeat).reserve();
+        }
+        else {
+            return  false;
         }
 
-        if (requestedSeat == null){
-            System.out.println("There is no seat "+ seatNumber);
-            return false;
-        }
-
-        return requestedSeat.reserve();
     }
 
 //    for testing
@@ -49,9 +41,14 @@ public class Theatre {
         }
     }
 
-    private class Seat {
+    private class Seat implements Comparable<Seat>{
         private String seatNumber;
         private boolean reserved = false;
+
+        @Override
+        public int compareTo(Seat seat) {
+           return this.seatNumber.compareToIgnoreCase(seat.getSeatNumber());
+        }
 
         public Seat(String seatNumber) {
             this.seatNumber = seatNumber;
